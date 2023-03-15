@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import dc.weather.R
 import dc.weather.databinding.ItemMainHourlyBinding
-import dc.weather.model.HourlyWeatherModel
+import dc.weather.business.model.HourlyWeatherModel
 
 class MainHourlyListAdapter : BaseAdapter<HourlyWeatherModel>() {
 

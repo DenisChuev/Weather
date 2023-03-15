@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import dc.weather.R
 import dc.weather.databinding.ItemMainDailyBinding
-import dc.weather.model.DailyWeatherModel
+import dc.weather.business.model.DailyWeatherModel
 
 class MainDailyListAdapter : BaseAdapter<DailyWeatherModel>() {
 
