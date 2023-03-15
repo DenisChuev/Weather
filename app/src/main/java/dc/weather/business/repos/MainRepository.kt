@@ -1,5 +1,7 @@
 package dc.weather.business.repos
 
+import android.annotation.SuppressLint
+import android.util.Log
 import dc.weather.business.ApiProvider
 import dc.weather.business.model.WeatherCurrentModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -8,6 +10,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 
 class MainRepository(api: ApiProvider) : BaseRepository<MainRepository.ServerResponse>(api) {
 
+    @SuppressLint("CheckResult")
     fun reloadData(lat: String, lon: String) {
         Observable.zip(
             api.getWeatherApi().getCurrentWeather(lat, lon),
@@ -24,7 +27,11 @@ class MainRepository(api: ApiProvider) : BaseRepository<MainRepository.ServerRes
             .doOnNext {/*TODO добавление объекта в бд*/ }
             /*.onErrorResumeNext {} TODO Извлечение объекта из бд*/
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({}, {})
+            .subscribe({
+                dataEmitter.onNext(it)
+            }, {
+                Log.d("MainRepository", "reload $it")
+            })
     }
 
     data class ServerResponse(

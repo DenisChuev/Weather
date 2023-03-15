@@ -10,7 +10,7 @@ import dc.weather.business.model.DailyWeatherModel
 import dc.weather.business.model.HourlyWeatherModel
 import dc.weather.business.model.WeatherCurrentModel
 import dc.weather.presenters.MainPresenter
-import dc.weather.view.MainView
+import dc.weather.view.*
 import dc.weather.view.adapters.MainDailyListAdapter
 import dc.weather.view.adapters.MainHourlyListAdapter
 import kotlinx.android.synthetic.main.activity_main.*
@@ -32,7 +32,6 @@ class MainActivity : MvpAppCompatActivity(), MainView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        updateUI()
         main_hourly_list.apply {
             adapter = MainHourlyListAdapter()
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
@@ -45,20 +44,6 @@ class MainActivity : MvpAppCompatActivity(), MainView {
         }
         mainPresenter.enable()
         geoService.requestLocationUpdates(locationRequest, geoCallback, null)
-    }
-
-    private fun updateUI() {
-        main_city_name.text = "Moscow"
-        main_date_tv.text = "23.02.2023"
-        main_weather_tv.text = "Clear"
-        main_weather_degree_tv.text = "25\u00B0"
-        main_min_degree_tv.text = "19"
-        main_max_degree_tv.text = "25"
-        main_therm_tv.text = "1.5pHa"
-        main_humidity_tv.text = "75%"
-        main_wind_tv.text = "5 m/s"
-        main_sunrise_tv.text = "04:30"
-        main_sunset_tv.text = "22:30"
     }
 
     // location logic
@@ -85,17 +70,29 @@ class MainActivity : MvpAppCompatActivity(), MainView {
     }
 
     override fun displayCurrentData(data: WeatherCurrentModel) {
-        main_city_name.text = "Moscow"
-        main_date_tv.text = "23.02.2023"
-        main_weather_tv.text = "Clear"
-        main_weather_degree_tv.text = "25\u00B0"
-        main_min_degree_tv.text = "19"
-        main_max_degree_tv.text = "25"
-        main_therm_tv.text = "1.5pHa"
-        main_humidity_tv.text = "75%"
-        main_wind_tv.text = "5 m/s"
-        main_sunrise_tv.text = "04:30"
-        main_sunset_tv.text = "22:30"
+        data.apply {
+            main_city_name.text = name
+            cloud_view.setImageResource(weather[0].icon.provideIcon())
+            main_date_tv.text = dt.toDateFormatOf(DAY_FULL_MONTH_NAME)
+            main_weather_tv.text = weather[0].description
+            main_weather_degree_tv.text = main.temp.toDegree()
+            main_min_degree_tv.text = main.temp_min.toDegree()
+            main_max_degree_tv.text = main.temp_max.toDegree()
+            main_therm_tv.text = buildString {
+                append(main.pressure.toString())
+                append(" hPa")
+            }
+            main_humidity_tv.text = buildString {
+                append(main.humidity.toString())
+                append(" %")
+            }
+            main_wind_tv.text = buildString {
+                append(wind.speed.toString())
+                append(" m/s")
+            }
+            main_sunrise_tv.text = sys.sunrise.toDateFormatOf(HOUR_DOUBLE_MINUTE)
+            main_sunset_tv.text = sys.sunset.toDateFormatOf(HOUR_DOUBLE_MINUTE)
+        }
     }
 
     override fun displayHourlyData(data: List<HourlyWeatherModel>) {

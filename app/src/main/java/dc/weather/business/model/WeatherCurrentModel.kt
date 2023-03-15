@@ -4,7 +4,7 @@ data class WeatherCurrentModel(
     val base: String,
     val clouds: Clouds,
     val coord: Coord,
-    val dt: Int,
+    val dt: Long,
     val id: Int,
     val main: Main,
     val name: String,
@@ -37,8 +37,8 @@ data class Main(
 
 data class Sys(
     val country: String,
-    val sunrise: Int,
-    val sunset: Int
+    val sunrise: Long,
+    val sunset: Long
 )
 
 data class Weather(
