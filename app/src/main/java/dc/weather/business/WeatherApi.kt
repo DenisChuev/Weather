@@ -1,6 +1,5 @@
 package dc.weather.business
 
-import dc.weather.business.model.Weather
 import dc.weather.business.model.WeatherCurrentModel
 import io.reactivex.rxjava3.core.Observable
 import retrofit2.http.GET
@@ -12,7 +11,9 @@ interface WeatherApi {
         @Query("lat") lat: String,
         @Query("lon") lon: String,
         @Query("appid") appid: String = "bbde336b2cf91b1b09f9e126f3cb4250",
-        @Query("lang") lang: String = "ru"
+        @Query("lang") lang: String = "ru",
+        @Query("cnt") cnt: Int = 1
+
     ): Observable<WeatherCurrentModel>
 
 }

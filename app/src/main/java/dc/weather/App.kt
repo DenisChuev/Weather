@@ -2,13 +2,22 @@ package dc.weather
 
 import android.app.Application
 import android.content.Intent
+import androidx.room.Room
+import dc.weather.business.room.OpenWeatherDatabase
 
 const val APP_SETTINGS = "APP_WEATHER"
 const val APP_STARTED_PREVIOUSLY = "APP_STARTED_PREVIOUSLY"
 
 class App : Application() {
+    companion object{
+        lateinit var db: OpenWeatherDatabase
+    }
     override fun onCreate() {
         super.onCreate()
+
+        db = Room.databaseBuilder(this, OpenWeatherDatabase::class.java, "OpenWeatherDB")
+            .fallbackToDestructiveMigration()
+            .build()
         val prefs = getSharedPreferences(APP_SETTINGS, MODE_PRIVATE)
         val flag = prefs.getBoolean(APP_STARTED_PREVIOUSLY, false)
 

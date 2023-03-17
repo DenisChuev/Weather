@@ -2,13 +2,17 @@ package dc.weather.business.repos
 
 import android.annotation.SuppressLint
 import android.util.Log
+import com.google.gson.Gson
 import dc.weather.business.ApiProvider
 import dc.weather.business.model.WeatherCurrentModel
+import dc.weather.business.room.WeatherCurrentEntity
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 class MainRepository(api: ApiProvider) : BaseRepository<MainRepository.ServerResponse>(api) {
+    private val gson = Gson()
+    private val dbAccess = db.getWeatherDao()
 
     @SuppressLint("CheckResult")
     fun reloadData(lat: String, lon: String) {
@@ -24,8 +28,27 @@ class MainRepository(api: ApiProvider) : BaseRepository<MainRepository.ServerRes
             { weatherData, geoCode -> ServerResponse(geoCode, weatherData) }
         )
             .subscribeOn(Schedulers.io())
-            .doOnNext {/*TODO добавление объекта в бд*/ }
-            /*.onErrorResumeNext {} TODO Извлечение объекта из бд*/
+            .doOnNext {
+                dbAccess.insertWeatherData(
+                    WeatherCurrentEntity(
+                        data = gson.toJson(it.weatherData),
+                        city = it.cityName
+                    )
+                )
+            }
+            .onErrorResumeNext {
+                Observable.just(
+                    ServerResponse(
+                        dbAccess.getWeatherData().city,
+                        gson.fromJson(
+                            dbAccess.getWeatherData().data,
+                            WeatherCurrentModel::class.java
+                        ),
+                        it
+                    )
+                )
+
+            }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 dataEmitter.onNext(it)
